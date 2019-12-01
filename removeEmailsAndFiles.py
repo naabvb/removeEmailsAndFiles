@@ -41,20 +41,15 @@ def main():
 
     for image in trash_images:
         if image in downloaded_images:
-            print(image)
             if (os.path.exists(BASE_PATH + 'images/' + image)):
-                print("on olemassa")
                 email_Id = image.split('_')[0]
-                print(email_Id)
                 try:
                     service.users().messages().trash(userId='me', id=email_Id).execute()
                     print("Trashed " + email_Id)
                 except errors.HttpError as error:
                     print(error)
+                os.remove(BASE_PATH + 'images/' + image)
 
 
-               # os.remove(BASE_PATH + 'images/' + image)
-   # print(downloaded_images)
-   # print(trash_images)
 if __name__ == '__main__':
     main()
