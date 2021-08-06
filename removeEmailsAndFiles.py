@@ -10,7 +10,7 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 
 SCOPES = ['https://mail.google.com/']
-BASE_PATH = '/home/pi/work_ssd/emailx/'
+BASE_PATH = os.path.dirname(os.path.realpath(__file__)) + '/'
 
 
 def main():
