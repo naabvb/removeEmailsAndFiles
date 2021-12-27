@@ -4,6 +4,8 @@
 
 import os
 import pickle
+import json
+import ast
 from apiclient import errors
 from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import InstalledAppFlow
@@ -14,6 +16,16 @@ BASE_PATH = os.path.dirname(os.path.realpath(__file__)) + '/'
 
 
 def main():
+
+    alreadyRead = []
+    if os.path.exists(BASE_PATH + 'alreadyRead.json'):
+        with open(BASE_PATH + 'alreadyRead.json', 'r') as json_file:
+            alreadyRead = json.load(json_file)
+            if type(alreadyRead) is not list:
+                try:
+                    alreadyRead = ast.literal_eval(alreadyRead)
+                except:
+                    print("Type translation failed")
 
     creds = None
     # The file token.pickle stores the user's access and refresh tokens, and is
@@ -44,11 +56,14 @@ def main():
             if (os.path.exists(BASE_PATH + 'images/' + image)):
                 email_Id = image.split('_')[0]
                 try:
-                    service.users().messages().trash(userId='me', id=email_Id).execute()
-                    print("Trashed " + email_Id)
+                    service.users().messages().delete(userId='me', id=email_Id).execute()
+                    alreadyRead.remove(email_Id)
+                    print("Deleted " + email_Id)
                 except errors.HttpError as error:
                     print(error)
                 os.remove(BASE_PATH + 'images/' + image)
+    with open(BASE_PATH + 'alreadyRead.json', 'w') as output:
+        json.dump(alreadyRead, output)
 
 
 if __name__ == '__main__':
