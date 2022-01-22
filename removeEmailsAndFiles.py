@@ -18,6 +18,7 @@ BASE_PATH = os.path.dirname(os.path.realpath(__file__)) + '/'
 def main():
 
     alreadyRead = []
+    filenames = []
     if os.path.exists(BASE_PATH + 'alreadyRead.json'):
         with open(BASE_PATH + 'alreadyRead.json', 'r') as json_file:
             alreadyRead = json.load(json_file)
@@ -26,7 +27,14 @@ def main():
                     alreadyRead = ast.literal_eval(alreadyRead)
                 except:
                     print("Type translation failed")
-
+    if os.path.exists(BASE_PATH + 'filenames.json'):
+        with open(BASE_PATH + 'filenames.json', 'r') as json_file:
+            filenames = json.load(json_file)
+            if type(filenames) is not list:
+                try:
+                    filenames = ast.literal_eval(filenames)
+                except:
+                    print("Type translation failed")
     creds = None
     # The file token.pickle stores the user's access and refresh tokens, and is
     # created automatically when the authorization flow completes for the first
@@ -58,10 +66,13 @@ def main():
                 try:
                     service.users().messages().delete(userId='me', id=email_Id).execute()
                     alreadyRead.remove(email_Id)
+                    filenames.remove(image)
                     print("Deleted " + email_Id)
                 except errors.HttpError as error:
                     print(error)
                 os.remove(BASE_PATH + 'images/' + image)
+    with open(BASE_PATH + 'filenames.json', 'w') as output:
+        json.dump(filenames, output)
     with open(BASE_PATH + 'alreadyRead.json', 'w') as output:
         json.dump(alreadyRead, output)
 
